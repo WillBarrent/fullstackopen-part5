@@ -1,7 +1,7 @@
 import { useState } from "react";
 import blogService from "../services/blogs";
 
-const Blog = ({ blog, blogs, setBlogs, username }) => {
+const Blog = ({ blog, blogs, setBlogs, username, handleLike }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -18,33 +18,6 @@ const Blog = ({ blog, blogs, setBlogs, username }) => {
     setVisible(!visible);
   };
 
-  const handleLike = async (event) => {
-    event.preventDefault();
-
-    try {
-      const result = await blogService.update(blog.id, {
-        ...blog,
-        user: blog.user.id,
-        likes: ++blog.likes,
-      });
-
-      const newBlogs = blogs.map((blog) => {
-        if (blog.id === result.id) {
-          return {
-            ...result,
-            user: blog.user,
-          };
-        }
-
-        return blog;
-      });
-
-      setBlogs(newBlogs);
-    } catch (error) {
-      console.log(error.response);
-    }
-  };
-
   const handleDeletion = async (event) => {
     event.preventDefault();
 
@@ -58,13 +31,25 @@ const Blog = ({ blog, blogs, setBlogs, username }) => {
   };
 
   return (
-    <div style={blogStyle}>
-      {blog.title} {blog.author}{" "}
-      <button onClick={toggleVisibility}>{visible ? "hide" : "show"}</button>
-      <div style={showWhenVisible}>
+    <div style={blogStyle} className="blog">
+      {blog.title} {blog.author}
+      <button className="visibilityBtn" onClick={toggleVisibility}>
+        {visible ? "hide" : "show"}
+      </button>
+      <div className="hiddenContent" style={showWhenVisible}>
         <div>{blog.url}</div>
         <div>
-          {blog.likes} <button onClick={handleLike}>like</button>
+          {blog.likes}
+          <button
+            className="like"
+            onClick={(e) => {
+              e.preventDefault();
+
+              handleLike(blog);
+            }}
+          >
+            like
+          </button>
         </div>
         <div>{blog.user.username}</div>
         {blog.user.username !== username ? (

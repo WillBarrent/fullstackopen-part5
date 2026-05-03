@@ -10,9 +10,6 @@ const App = () => {
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
   const [notification, setNotification] = useState(null);
 
   const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
@@ -63,9 +60,7 @@ const App = () => {
     setUser(null);
   };
 
-  const handleBlogAddition = async (event) => {
-    event.preventDefault();
-
+  const handleBlogAddition = async ({title, author, url}) => {
     const newBlog = {
       title,
       author,
@@ -75,10 +70,6 @@ const App = () => {
     try {
       const blog = await blogService.create(newBlog);
       setBlogs([...blogs, { ...blog, user: user }]);
-
-      setTitle("");
-      setAuthor("");
-      setUrl("");
 
       blogFormRef.current.toggleVisibility();
 
@@ -91,6 +82,31 @@ const App = () => {
       setTimeout(() => {
         setNotification(null);
       }, 3000);
+    }
+  };
+
+  const handleLike = async (blog) => {
+    try {
+      const result = await blogService.update(blog.id, {
+        ...blog,
+        user: blog.user.id,
+        likes: ++blog.likes,
+      });
+
+      const newBlogs = blogs.map((blog) => {
+        if (blog.id === result.id) {
+          return {
+            ...result,
+            user: blog.user,
+          };
+        }
+
+        return blog;
+      });
+
+      setBlogs(newBlogs);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -140,12 +156,6 @@ const App = () => {
       <Togglable buttonLabel="new blog" ref={blogFormRef}>
         <NewBlogForm
           handleBlogAddition={handleBlogAddition}
-          author={author}
-          setAuthor={setAuthor}
-          title={title}
-          setTitle={setTitle}
-          url={url}
-          setUrl={setUrl}
         />
       </Togglable>
       {sortedBlogs.map((blog) => (
@@ -155,6 +165,7 @@ const App = () => {
           blogs={blogs}
           setBlogs={setBlogs}
           username={user.username}
+          handleLike={handleLike}
         />
       ))}
     </div>
