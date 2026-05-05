@@ -1,23 +1,14 @@
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import blogService from "../services/blogs";
 
-const Blog = ({ blog, blogs, setBlogs, username, handleLike }) => {
+const Blog = ({ blog, blogs, setBlogs, user, handleLike }) => {
+  const navigate = useNavigate();
+
   const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
+    marginTop: 10,
+    padding: 10,
     border: "solid",
     borderWidth: 1,
-    marginBottom: 5,
-  };
-
-  console.log(blog);
-
-  const [visible, setVisible] = useState(false);
-
-  const showWhenVisible = { display: visible ? "" : "none" };
-
-  const toggleVisibility = () => {
-    setVisible(!visible);
   };
 
   const handleDeletion = async (event) => {
@@ -27,34 +18,38 @@ const Blog = ({ blog, blogs, setBlogs, username, handleLike }) => {
       await blogService.remove(blog.id);
       const newBlogs = blogs.filter((b) => b.id !== blog.id);
       setBlogs(newBlogs);
+      navigate("/")
     } catch (error) {
       console.log(error.reponse);
     }
   };
 
+  if (!blog) {
+    return <></>;
+  }
+
   return (
     <div style={blogStyle} className="blog">
-      {blog.title} {blog.author}
-      <button className="visibilityBtn" onClick={toggleVisibility}>
-        {visible ? "hide" : "show"}
-      </button>
-      <div className="hiddenContent" style={showWhenVisible}>
+      <h1>{blog.title}</h1>
+      <div>
         <div>{blog.url}</div>
         <div>
           <span data-testid="likes">{blog.likes}</span>
-          <button
-            className="like"
-            onClick={(e) => {
-              e.preventDefault();
+          {!user ? null : (
+            <button
+              className="like"
+              onClick={(e) => {
+                e.preventDefault();
 
-              handleLike(blog);
-            }}
-          >
-            like
-          </button>
+                handleLike(blog);
+              }}
+            >
+              like
+            </button>
+          )}
         </div>
-        <div>{blog.user.username}</div>
-        {blog.user.username !== username ? (
+        <div>Added by {blog.user.username}</div>
+        {!user || blog.user.username !== user.username ? (
           <></>
         ) : (
           <button onClick={handleDeletion}>remove</button>

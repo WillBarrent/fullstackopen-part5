@@ -1,9 +1,19 @@
 import { useState, useEffect, useRef } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+  useMatch,
+} from "react-router-dom";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import Togglable from "./components/Togglable";
 import NewBlogForm from "./components/NewBlogForm";
+import Blogs from "./components/Blogs";
+import Login from "./components/Login";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -11,8 +21,11 @@ const App = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [notification, setNotification] = useState(null);
+  const navigate = useNavigate();
 
   const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
+  const match = useMatch("/blogs/:id");
+  const blog = match ? blogs.find((blog) => blog.id === match.params.id) : null;
 
   const blogFormRef = useRef();
 
@@ -45,6 +58,7 @@ const App = () => {
       setTimeout(() => {
         setNotification(null);
       }, 3000);
+      navigate("/");
     } catch (error) {
       setNotification(error.response.data.error);
       setTimeout(() => {
@@ -58,9 +72,11 @@ const App = () => {
 
     window.localStorage.removeItem("loggedUser");
     setUser(null);
+
+    navigate("/");
   };
 
-  const handleBlogAddition = async ({title, author, url}) => {
+  const handleBlogAddition = async ({ title, author, url }) => {
     const newBlog = {
       title,
       author,
@@ -76,12 +92,12 @@ const App = () => {
       setNotification("Blog has been added!");
       setTimeout(() => {
         setNotification(null);
-      }, 3000);
+      }, 5000);
     } catch (error) {
-      setNotification(error.response.data.error);
+      setNotification(error.response);
       setTimeout(() => {
         setNotification(null);
-      }, 3000);
+      }, 5000);
     }
   };
 
@@ -110,64 +126,79 @@ const App = () => {
     }
   };
 
-  if (!user) {
-    return (
-      <form onSubmit={handleLogin}>
-        <h2>log in to application</h2>
-        {!notification ? <></> : <p>{notification}</p>}
-        <div>
-          <label>
-            username
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => {
-                setUsername(e.target.value);
-              }}
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            password
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-              }}
-            />
-          </label>
-        </div>
-        <button type="submit">login</button>
-      </form>
-    );
-  }
-
   return (
     <div>
-      <h2>blogs</h2>
-      {!notification ? <></> : <p>{notification}</p>}
-      <p>
-        {user && user.username} logged in{" "}
-        <button onClick={handleLogout}>logout</button>
-      </p>
-      <h2>create new</h2>
-      <Togglable buttonLabel="new blog" ref={blogFormRef}>
-        <NewBlogForm
-          handleBlogAddition={handleBlogAddition}
+      <div>
+        <Link
+          style={{
+            padding: 5,
+          }}
+          to="/"
+        >
+          blogs
+        </Link>
+        {!user ? (
+          <></>
+        ) : (
+          <Link
+            style={{
+              padding: 5,
+            }}
+            to="/create"
+          >
+            new blog
+          </Link>
+        )}
+        {!user ? (
+          <Link
+            style={{
+              padding: 5,
+            }}
+            to="/login"
+          >
+            login
+          </Link>
+        ) : (
+          <button onClick={handleLogout}>logout</button>
+        )}
+      </div>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Blogs notification={notification} sortedBlogs={sortedBlogs} />
+          }
         />
-      </Togglable>
-      {sortedBlogs.map((blog) => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-          blogs={blogs}
-          setBlogs={setBlogs}
-          username={user.username}
-          handleLike={handleLike}
+        <Route
+          path="/blogs/:id"
+          element={
+            <Blog
+              blog={blog}
+              blogs={blogs}
+              setBlogs={setBlogs}
+              user={user ? user : null}
+              handleLike={handleLike}
+            />
+          }
         />
-      ))}
+        <Route
+          path="/create"
+          element={<NewBlogForm handleBlogAddition={handleBlogAddition} />}
+        />
+        <Route
+          path="/login"
+          element={
+            <Login
+              handleLogin={handleLogin}
+              notification={notification}
+              password={password}
+              setPassword={setPassword}
+              user={user}
+              setUsername={setUsername}
+            />
+          }
+        />
+      </Routes>
     </div>
   );
 };

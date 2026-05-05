@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const NewBlogForm = ({ handleBlogAddition }) => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
+
+  const navigate = useNavigate();
 
   const addBlog = (event) => {
     event.preventDefault();
@@ -13,10 +16,13 @@ const NewBlogForm = ({ handleBlogAddition }) => {
     setTitle("");
     setAuthor("");
     setUrl("");
+
+    navigate("/");
   };
 
   return (
     <form onSubmit={addBlog}>
+      <h2>Create new blog</h2>
       <div>
         <label>
           title
