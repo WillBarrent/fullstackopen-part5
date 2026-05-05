@@ -106,7 +106,7 @@ const App = () => {
 
       setBlogs(newBlogs);
     } catch (error) {
-      console.log(error);
+      console.log(error.response);
     }
   };
 

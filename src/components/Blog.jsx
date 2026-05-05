@@ -10,6 +10,8 @@ const Blog = ({ blog, blogs, setBlogs, username, handleLike }) => {
     marginBottom: 5,
   };
 
+  console.log(blog);
+
   const [visible, setVisible] = useState(false);
 
   const showWhenVisible = { display: visible ? "" : "none" };
@@ -39,7 +41,7 @@ const Blog = ({ blog, blogs, setBlogs, username, handleLike }) => {
       <div className="hiddenContent" style={showWhenVisible}>
         <div>{blog.url}</div>
         <div>
-          {blog.likes}
+          <span data-testid="likes">{blog.likes}</span>
           <button
             className="like"
             onClick={(e) => {
