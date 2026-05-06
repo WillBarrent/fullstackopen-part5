@@ -14,6 +14,14 @@ import Togglable from "./components/Togglable";
 import NewBlogForm from "./components/NewBlogForm";
 import Blogs from "./components/Blogs";
 import Login from "./components/Login";
+import {
+  AppBar,
+  Box,
+  Button,
+  Container,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -125,41 +133,33 @@ const App = () => {
   };
 
   return (
-    <div>
-      <div>
-        <Link
-          style={{
-            padding: 5,
-          }}
-          to="/"
-        >
-          blogs
-        </Link>
-        {!user ? (
-          <></>
-        ) : (
-          <Link
-            style={{
-              padding: 5,
-            }}
-            to="/create"
-          >
-            new blog
-          </Link>
-        )}
-        {!user ? (
-          <Link
-            style={{
-              padding: 5,
-            }}
-            to="/login"
-          >
-            login
-          </Link>
-        ) : (
-          <button onClick={handleLogout}>logout</button>
-        )}
-      </div>
+    <Container>
+      <AppBar position="static">
+        <Toolbar style={{ justifyContent: "space-between" }}>
+          <Typography variant="h5">Blog App</Typography>
+          <Box>
+            <Button color="inherit" component={Link} to="/">
+              <Typography>blogs</Typography>
+            </Button>
+            {!user ? (
+              <></>
+            ) : (
+              <Button color="inherit" component={Link} to="/create">
+                <Typography>new blog</Typography>
+              </Button>
+            )}
+            {!user ? (
+              <Button color="inherit" component={Link} to="/login">
+                <Typography>login</Typography>
+              </Button>
+            ) : (
+              <Button color="inherit" onClick={handleLogout}>
+                <Typography>logout</Typography>
+              </Button>
+            )}
+          </Box>
+        </Toolbar>
+      </AppBar>
       <Routes>
         <Route
           path="/"
@@ -203,7 +203,7 @@ const App = () => {
           }
         />
       </Routes>
-    </div>
+    </Container>
   );
 };
 

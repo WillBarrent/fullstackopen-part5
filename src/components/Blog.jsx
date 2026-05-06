@@ -1,15 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import blogService from "../services/blogs";
+import { Button, Card, CardContent, Stack, Typography } from "@mui/material";
 
 const Blog = ({ blog, blogs, setBlogs, user, handleLike }) => {
   const navigate = useNavigate();
-
-  const blogStyle = {
-    marginTop: 10,
-    padding: 10,
-    border: "solid",
-    borderWidth: 1,
-  };
 
   const handleDeletion = async (event) => {
     event.preventDefault();
@@ -29,35 +23,54 @@ const Blog = ({ blog, blogs, setBlogs, user, handleLike }) => {
   }
 
   return (
-    <div style={blogStyle} className="blog">
-      <h1 className="title">{blog.title}</h1>
-      <div>
-        <div className="url">{blog.url}</div>
-        <div>
-          <span className="likes" data-testid="likes">
-            {blog.likes}
-          </span>
-          {!user ? null : (
-            <button
-              className="like"
-              onClick={(e) => {
-                e.preventDefault();
-
-                handleLike(blog);
-              }}
+    <Card style={{ marginTop: 10 }} className="blog">
+      <CardContent>
+        <Typography variant="h5" className="title">
+          {blog.title}
+        </Typography>
+        <Typography variant="caption" className="author">
+          by {blog.author}
+        </Typography>
+        <Typography className="url" variant="body1" className="url">
+          <a href={`https://${blog.url}`}>{blog.url}</a>
+        </Typography>
+        <Typography variant="body1" className="addedBy">
+          Added by {blog.user.username}
+        </Typography>
+        <Stack
+          sx={{ alignItems: "center" }}
+          direction="row"
+          spacing={2}
+          style={{ marginTop: 10 }}
+        >
+          <Typography noWrap>
+            <span
+              style={{ marginRight: 5 }}
+              className="likes"
+              data-testid="likes"
             >
+              {blog.likes}
+            </span>
+            likes
+          </Typography>
+          {!user ? null : (
+            <Button onClick={() => {
+              handleLike(blog);
+            }} variant="outlined">
               like
-            </button>
+            </Button>
           )}
-        </div>
-        <div className="createdBy">Added by {blog.user.username}</div>
-        {!user || blog.user.username !== user.username ? (
-          <></>
-        ) : (
-          <button className="remove" onClick={handleDeletion}>remove</button>
-        )}
-      </div>
-    </div>
+
+          {!user || blog.user.username !== user.username ? (
+            <></>
+          ) : (
+            <Button onClick={handleDeletion} variant="outlined" color="error">
+              remove
+            </Button>
+          )}
+        </Stack>
+      </CardContent>
+    </Card>
   );
 };
 

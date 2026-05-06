@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Notification from "./Notification";
+import { Button, TextField } from "@mui/material";
 
 const NewBlogForm = ({ handleBlogAddition, notification, user }) => {
   const [title, setTitle] = useState("");
@@ -21,44 +23,40 @@ const NewBlogForm = ({ handleBlogAddition, notification, user }) => {
   return (
     <form onSubmit={addBlog}>
       <h2>Create new blog</h2>
-      {!notification ? <></> : <p>{notification}</p>}
+      <Notification notification={notification} />
       <div>
-        <label>
-          title
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-            }}
-          />
-        </label>
+        <TextField
+          label="title"
+          value={title}
+          onChange={(e) => {
+            setTitle(e.target.value);
+          }}
+          style={{ marginBottom: 10 }}
+        />
       </div>
       <div>
-        <label>
-          author
-          <input
-            type="text"
-            value={author}
-            onChange={(e) => {
-              setAuthor(e.target.value);
-            }}
-          />
-        </label>
+        <TextField
+          label="author"
+          value={author}
+          onChange={(e) => {
+            setAuthor(e.target.value);
+          }}
+          style={{ marginBottom: 10 }}
+        />
       </div>
       <div>
-        <label>
-          url
-          <input
-            type="text"
-            value={url}
-            onChange={(e) => {
-              setUrl(e.target.value);
-            }}
-          />
-        </label>
+        <TextField
+          label="url"
+          value={url}
+          onChange={(e) => {
+            setUrl(e.target.value);
+          }}
+          style={{ marginBottom: 10 }}
+        />
       </div>
-      <button type="submit">create</button>
+      <Button type="submit" variant="contained" style={{ marginTop: 10 }}>
+        create
+      </Button>
     </form>
   );
 };
