@@ -10,4 +10,4 @@ const createBlog = async (page, title) => {
   await showButton.click();
 };
 
-export { createBlog };
+module.exports = { createBlog };

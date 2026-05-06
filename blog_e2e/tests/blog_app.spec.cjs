@@ -32,51 +32,74 @@ describe("Blog app", () => {
   });
 
   describe("login", () => {
+    beforeEach(async ({ page, request }) => {
+      await page.goto("http://localhost:5173/login");
+    });
+
     test("succeeds with correct credentials", async ({ page }) => {
       await page.getByLabel("username").fill("test");
       await page.getByLabel("password").fill("123456");
       await page.getByRole("button", { name: "login" }).click();
-      await expect(page.getByText("test logged in")).toBeVisible();
+
+      await page.waitForURL("http://localhost:5173/");
+      await expect(page.url()).toBe("http://localhost:5173/");
+      await expect(
+        page.getByText("You have successfully logged in!"),
+      ).toBeVisible();
     });
+
     test("fails with wrong credentials", async ({ page }) => {
       await page.getByLabel("username").fill("test");
       await page.getByLabel("password").fill("123");
       await page.getByRole("button", { name: "login" }).click();
+
+      await expect(page.url()).toBe("http://localhost:5173/login");
       await expect(
         page.getByText("Invalid password or username"),
       ).toBeVisible();
-      await expect(page.getByText("test logged in")).not.toBeVisible();
     });
   });
 
   describe("when logged in", () => {
     beforeEach(async ({ page }) => {
+      await page.goto("http://localhost:5173/login");
       await page.getByLabel("username").fill("test");
       await page.getByLabel("password").fill("123456");
       await page.getByRole("button", { name: "login" }).click();
+
+      await page.waitForURL("http://localhost:5173/");
     });
 
     test("a new blog can be created", async ({ page }) => {
-      await page.getByRole("button", { name: "new blog" }).click();
+      await page.getByRole("link", { name: "new blog" }).click();
+      await page.waitForURL("http://localhost:5173/create");
+
       await page.getByLabel("title").fill("Playwright is awesome");
       await page.getByLabel("author").fill("Playwright");
       await page.getByLabel("url").fill("playwright.com");
       await page.getByRole("button", { name: "create" }).click();
+
+      await page.waitForURL("http://localhost:5173/");
+      await expect(page.url()).toBe("http://localhost:5173/");
 
       await expect(page.getByText("Playwright is awesome")).toBeVisible();
     });
 
     describe("and 1 blog is added", () => {
       beforeEach(async ({ page }) => {
-        await page.getByRole("button", { name: "new blog" }).click();
+        await page.getByRole("link", { name: "new blog" }).click();
+        await page.waitForURL("http://localhost:5173/create");
+
         await page.getByLabel("title").fill("Playwright is awesome");
         await page.getByLabel("author").fill("Playwright");
         await page.getByLabel("url").fill("playwright.com");
         await page.getByRole("button", { name: "create" }).click();
+
+        await page.waitForURL("http://localhost:5173/");
       });
 
       test("a blog can be liked", async ({ page }) => {
-        await page.getByRole("button", { name: "show" }).click();
+        await page.getByRole("link", { name: "Playwright is awesome" }).click();
         await expect(page.getByTestId("likes")).toContainText("0");
         await page.getByRole("button", { name: "like" }).click();
         await expect(page.getByTestId("likes")).toContainText("1");
@@ -84,10 +107,13 @@ describe("Blog app", () => {
 
       //   By the user who created it
       test("a blog can de deleted", async ({ page }) => {
-        await expect(page.getByText("Playwright is awesome")).toBeVisible();
-        await page.getByRole("button", { name: "show" }).click();
+        await page.getByRole("link", { name: "Playwright is awesome" }).click();
         await page.getByRole("button", { name: "remove" }).click();
-        await expect(page.getByText("Playwright is awesome")).not.toBeVisible();
+        await page.waitForURL("http://localhost:5173/");
+        await expect(page.url()).toBe("http://localhost:5173/");
+        await expect(
+          page.getByRole("link", { name: "Playwright is awesome" }),
+        ).not.toBeVisible();
       });
 
       test("a blog cannot be deleted by random user", async ({ page }) => {

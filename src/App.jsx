@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -26,8 +26,6 @@ const App = () => {
   const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
   const match = useMatch("/blogs/:id");
   const blog = match ? blogs.find((blog) => blog.id === match.params.id) : null;
-
-  const blogFormRef = useRef();
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -87,14 +85,14 @@ const App = () => {
       const blog = await blogService.create(newBlog);
       setBlogs([...blogs, { ...blog, user: user }]);
 
-      blogFormRef.current.toggleVisibility();
-
       setNotification("Blog has been added!");
       setTimeout(() => {
         setNotification(null);
       }, 5000);
+
+      navigate("/");
     } catch (error) {
-      setNotification(error.response);
+      setNotification(error.response.data.error);
       setTimeout(() => {
         setNotification(null);
       }, 5000);
@@ -183,7 +181,13 @@ const App = () => {
         />
         <Route
           path="/create"
-          element={<NewBlogForm handleBlogAddition={handleBlogAddition} />}
+          element={
+            <NewBlogForm
+              handleBlogAddition={handleBlogAddition}
+              notification={notification}
+              user={user}
+            />
+          }
         />
         <Route
           path="/login"

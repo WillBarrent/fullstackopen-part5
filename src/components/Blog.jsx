@@ -18,7 +18,7 @@ const Blog = ({ blog, blogs, setBlogs, user, handleLike }) => {
       await blogService.remove(blog.id);
       const newBlogs = blogs.filter((b) => b.id !== blog.id);
       setBlogs(newBlogs);
-      navigate("/")
+      navigate("/");
     } catch (error) {
       console.log(error.reponse);
     }
@@ -30,11 +30,13 @@ const Blog = ({ blog, blogs, setBlogs, user, handleLike }) => {
 
   return (
     <div style={blogStyle} className="blog">
-      <h1>{blog.title}</h1>
+      <h1 className="title">{blog.title}</h1>
       <div>
-        <div>{blog.url}</div>
+        <div className="url">{blog.url}</div>
         <div>
-          <span data-testid="likes">{blog.likes}</span>
+          <span className="likes" data-testid="likes">
+            {blog.likes}
+          </span>
           {!user ? null : (
             <button
               className="like"
@@ -48,11 +50,11 @@ const Blog = ({ blog, blogs, setBlogs, user, handleLike }) => {
             </button>
           )}
         </div>
-        <div>Added by {blog.user.username}</div>
+        <div className="createdBy">Added by {blog.user.username}</div>
         {!user || blog.user.username !== user.username ? (
           <></>
         ) : (
-          <button onClick={handleDeletion}>remove</button>
+          <button className="remove" onClick={handleDeletion}>remove</button>
         )}
       </div>
     </div>
